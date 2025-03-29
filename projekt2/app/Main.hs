@@ -19,8 +19,9 @@ defToMap lst = foldr change Map.empty lst
             else Map.insert name (Def name list expr) mapping
 
 
-rstep :: Expr -> Expr -> DefMap -> (Expr, Expr)
-rstep pref ((Var x):$xs) mapping =  case Map.lookup x mapping of
+rstep :: Expr -> Expr -> DefMap -> (Expr, Maybe Expr)
+rstep pref ((a :$ b) :$ c) mapping = rstep pref (a :$ b :$ c) mapping
+rstep pref (Var x:$xs) mapping =  case Map.lookup x mapping of
                                     Nothing -> rstep (pref :$ Var x) xs mapping
                                     Just val -> checkstep pref val xs mapping
     where
@@ -35,8 +36,8 @@ rstep pref ((Var x):$xs) mapping =  case Map.lookup x mapping of
 
     
 
-    reduce :: Expr -> Expr -> ExprMap -> Expr -> (Expr, Expr)                   
-    reduce prefs expr' small_mapping rest = (prefs, subReduce expr' small_mapping :$ rest)
+    reduce :: Expr -> Expr -> ExprMap -> Expr -> (Expr, Maybe Expr)                   
+    reduce prefs expr' small_mapping rest = (prefs, Just (subReduce expr' small_mapping :$ rest))
 
 
     takeParams :: Int -> [Expr] -> Expr -> ([Expr], Expr, Bool)
@@ -45,14 +46,17 @@ rstep pref ((Var x):$xs) mapping =  case Map.lookup x mapping of
     takeParams _ params rest = (params, rest, False)
 
 
-    checkstep :: Expr -> Def -> Expr -> DefMap -> (Expr, Expr)
+    checkstep :: Expr -> Def -> Expr -> DefMap -> (Expr, Maybe Expr)
     checkstep pref' (Def name pats expr) rest mapping' = 
         let (params, new_rest, out) = takeParams (length pats) [] rest
             in
             if out 
                 then reduce pref' expr (Map.fromList (zip pats params)) new_rest
                 else rstep (pref' :$ (Var name)) rest mapping'
-rstep pref expr _ = (pref, expr)
+rstep pref (Var x) mapping = case Map.lookup x mapping of 
+                             Nothing -> (pref :$ Var x, Nothing)
+                             Just (Def name pats expr) -> if null pats then (pref, Just expr)
+                                                          else (pref :$ Var name, Nothing) 
 
 -- Dopisz case gdy jest samo Var x i potencjalnie (a:$b):$c
 
