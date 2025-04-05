@@ -24,6 +24,7 @@ fromHsString path = do
 
         -- Changes every HsDecl into coresponding Def.
         extractFun :: [HsDecl] -> [Def]
+        extractFun ((HsFunBind (_:_:_)):_) = error "ERROR: Many definitions of the same combinator."
         extractFun (HsFunBind mat:xs) = let ans = extractFun xs
                                             in 
                                             extractMatch (head mat) : ans
@@ -44,7 +45,7 @@ fromHsString path = do
                                             let (pars, _) = validPar params' name'
                                               in
                                               case name' of
-                                              "main" -> error "ERROR: Main can't have parameters."
+                                              "main" -> error "ERROR: main can't have parameters."
                                               _ -> Def name' pars (extractRight out')
         process (HsIdent name') Nothing (HsUnGuardedRhs out') = Def name' [] (extractRight out')
         process _ _ _ = error "INTERNAL ERROR: Not expected pattern in process."                                            
