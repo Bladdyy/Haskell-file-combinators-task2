@@ -15,13 +15,10 @@ steps :: Int
 steps = 30
 
 instance Show Expr where
-    show = ($ "") . subShow
-        where
-        handleRight (e1' :$ e2') = showString "(" . subShow e1' . showString " "
-                                 . handleRight e2' . showString ")"
-        handleRight (Var name) = showString name
-        subShow (e1 :$ e2) = subShow e1 . showString " " . handleRight e2
-        subShow (Var name) = showString name
+    showsPrec _ (Var name) = showString name
+    showsPrec p (e1 :$ e2) =
+        showParen (p > 10) $ -- Add parentheses if precedence is greater than 10
+            showsPrec 9 e1 . showString " " . showsPrec 11 e2
 
 
 instance Show Def where
