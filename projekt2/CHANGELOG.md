@@ -1,4 +1,4 @@
-# Revision history for projekt2
+# Revision history for jp448431-zadanie2
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

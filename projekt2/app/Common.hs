@@ -12,7 +12,7 @@ type DefMap = Map.Map Name Def
 type ExprMap = Map.Map Name Expr
 
 steps :: Int
-steps = 30
+steps = 29
 
 instance Show Expr where
     showsPrec _ (Var name) = showString name
