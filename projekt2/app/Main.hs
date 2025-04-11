@@ -29,4 +29,4 @@ main = do
                             mapM_ print out
                             putStrLn "------------------------------------------------------------"
                             print expr
-                            iterateSteps steps Nothing (Just expr) mapping
+                            iterateSteps steps expr mapping
