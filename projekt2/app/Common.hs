@@ -17,8 +17,7 @@ steps = 29
 instance Show Expr where
     showsPrec _ (Var name) = showString name
     showsPrec p (e1 :$ e2) =
-        showParen (p > 10) $ -- Add parentheses if precedence is greater than 10
-            showsPrec 9 e1 . showString " " . showsPrec 11 e2
+        showParen (p > 10) (showsPrec 9 e1 . showString " " . showsPrec 11 e2)
 
 
 instance Show Def where
