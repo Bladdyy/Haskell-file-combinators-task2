@@ -19,7 +19,8 @@ rstep expr mapping = let (new_expr, _, code, _) = findReduce expr 0 Nothing
             (-1) -> let (small_pref, Def nam' par' ex', to_param', lst') = findReduce e2 0 Nothing
                       in 
                       case small_pref of
-                        Just pref' -> (Just (merge new_pref pref'), Def nam' par' ex', to_param', lst')
+                        Just pref' -> (Just (merge new_pref pref'), 
+                                              Def nam' par' ex', to_param', lst')
                         Nothing -> (new_pref, Def nam' par' ex', to_param', lst')
             -- Reducable part found and reduced already.
             (-2) -> (Just (merge new_pref e2), Def nam par ex, to_param, lst)
@@ -56,7 +57,7 @@ rstep expr mapping = let (new_expr, _, code, _) = findReduce expr 0 Nothing
 
     -- Performes reduction.
     subReduce :: Expr -> ExprMap -> Expr
-    subReduce (a :$ b) small_map = subReduce a small_map :$ (subReduce b small_map)
+    subReduce (a :$ b) small_map = subReduce a small_map :$ subReduce b small_map
     subReduce (Var name) small_map = case Map.lookup name small_map of
                                      Nothing -> Var name
                                      Just val -> val
